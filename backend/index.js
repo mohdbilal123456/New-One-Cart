@@ -21,6 +21,15 @@ app.use(cors({
  credentials:true
 }))
 
+// Preflight request handle
+app.options("*", cors({
+  origin:[
+    "https://new-one-cart-frontend.onrender.com",
+    "https://new-one-cart-admin.onrender.com"
+  ],
+  credentials:true
+}));
+
 app.use("/api/auth",authRoutes)
 app.use("/api/user",userRoutes)
 app.use("/api/product",productRoutes)
