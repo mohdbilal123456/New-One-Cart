@@ -104,24 +104,27 @@ export const googleLogin = async (req,res) => {
 
 export const adminLogin = async (req,res) => {
     try {
-        let {email , password} = req.body
-        if(email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD){
-        let token = await genToken1(email)
-        res.cookie("token",token,{
-        httpOnly:true,
-        secure:true,
-        sameSite: "none",
-        maxAge: 1 * 24 * 60 * 60 * 1000
-    })
-    return res.status(200).json(token)
-        }
-        return res.status(400).json({message:"Invaild creadintials"})
+    const { email, password } = req.body;
 
-    } catch (error) {
-        console.log("AdminLogin error")
-    return res.status(500).json({message:`AdminLogin error ${error}`})
-        
+    if (email !== process.env.ADMIN_EMAIL || password !== process.env.ADMIN_PASSWORD) {
+      return res.status(400).json({ message: "Invalid Admin Credentials" });
     }
+
+    // JWT generate
+    const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: "1d" });
+
+    // Cookie set
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,       // HTTPS required
+      sameSite: "none",   // Cross-domain
+      maxAge: 24 * 60 * 60 * 1000
+    });
+
+    res.status(200).json({ message: "Admin logged in successfully" });
+  } catch (error) {
+    res.status(500).json({ message: `Server error: ${error}` });
+  }
     
 }
 
